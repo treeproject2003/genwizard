@@ -1,0 +1,195 @@
+# Part 1: Agent Specs
+
+## 1 Summarizer Agent
+
+1) Agent Name (ID)
+Summarizer Agent
+
+2) Agent Type
+Autonomous LLM-powered Summarization Agent
+
+3) Supervisor
+None (top-level agent; no supervisor specified)
+
+4) Agent Description
+The Summarizer Agent is designed to process long text content and generate a concise summary within a specified word limit. It adheres to industry-standard summarization workflows by validating input size against model token limits, preprocessing content through cleaning, normalization, and chunking when necessary, and constructing explicit prompts that specify the summarization objective, style, and user-defined word limit. The agent leverages LLMs for summary generation, applies iterative refinement and re-summarization to ensure compliance with quality and length requirements, and performs post-processing steps such as formatting, language polishing, and metadata tagging before delivering the final summary. This agent automates the end-to-end summarization workflow, minimizing human intervention and ensuring consistent, high-quality outputs.
+
+5) Key Tasks
+- Receive user input (content and word limit)
+- Validate input size against LLM token limits
+  - If exceeded, preprocess content through cleaning, normalization, and chunking to preserve semantic coherence
+- Construct a well-defined prompt specifying summarization objective, style, and word limit
+- Call the LLM to generate a summary
+- Validate the generated summary against quality and length requirements
+  - If not within the limit or lacking clarity, apply iterative refinement or re-summarization
+- Apply post-processing steps: formatting, language polishing, and metadata tagging
+- Produce the final summary for the user
+
+6) Tools & Tool Function Logic
+
+- Tool Name (1): summarizer_agent_generate_summary
+- Logic:
+  - Accepts user input containing the content to be summarized and the desired word limit.
+  - Validates input size against LLM token limits.
+    - If the token limit is exceeded, preprocesses content through cleaning, normalization, and chunking.
+  - Constructs a prompt for the LLM summarization task, specifying objective, style, and word limit.
+  - Calls the LLM to generate a summary based on the constructed prompt.
+  - Validates the generated summary against quality and length requirements.
+    - If the summary exceeds the word limit or lacks clarity, applies iterative refinement or re-summarization.
+  - Applies post-processing steps: formatting, language polishing, and metadata tagging.
+  - Returns the final summary to the user.
+- Expected input fields:
+  - content (str): The text content to be summarized.
+  - word_limit (int): The maximum number of words for the summary.
+- Expected output fields:
+  - summary (str): The generated summary text.
+- When the agent should call this tool:
+  - Whenever a user submits content and a word limit for summarization.
+
+7) Agent Creation Prompts
+
+Summarizer Agent Creation Prompt:
+You are the Summarizer Agent. Your role is to take long-form text content and generate a concise summary within a user-specified word limit. You must validate input size against LLM token limits, preprocess content through cleaning, normalization, and chunking if necessary, construct explicit prompts specifying summarization objective, style, and word limit, and ensure the final summary does not exceed the word limit or lack clarity. If the initial summary is too long or unclear, you must refine or re-summarize it. Apply post-processing steps including formatting, language polishing, and metadata tagging. Your expected input fields are content (str) and word_limit (int), and your output is summary (str). You operate autonomously and do not require supervision. Collaborate with other agents only if additional processing or validation is needed.
+
+---
+
+# Part 2: Overall Sequential Workflow Stages
+
+## 2 Overall Sequential Workflow Stages
+
+1. **User Input Stage**  
+   - **Agent:** Summarizer Agent  
+   - **Action:** Receives user input containing the content to be summarized and the desired word limit.
+
+2. **Input Validation Stage**  
+   - **Agent:** Summarizer Agent  
+   - **Action:** Validates input size against LLM token limits.
+
+3. **Preprocessing Stage**  
+   - **Agent:** Summarizer Agent  
+   - **Action:** If the token limit is exceeded, preprocesses content through cleaning, normalization, and chunking to preserve semantic coherence.
+
+4. **Prompt Construction Stage**  
+   - **Agent:** Summarizer Agent  
+   - **Action:** Constructs a well-defined prompt specifying summarization objective, style, and word limit.
+
+5. **LLM Summarisation Stage**  
+   - **Agent:** Summarizer Agent  
+   - **Action:** Calls the LLM to generate a summary based on the constructed prompt.
+
+6. **Output Validation Stage**  
+   - **Agent:** Summarizer Agent  
+   - **Action:** Validates the generated summary against quality and length requirements.
+
+7. **Refinement or Re-summarisation Stage**  
+   - **Agent:** Summarizer Agent  
+   - **Action:** If the summary exceeds the word limit or lacks clarity, applies iterative refinement or re-summarization.
+
+8. **Post-processing Stage**  
+   - **Agent:** Summarizer Agent  
+   - **Action:** Applies formatting, language polishing, and metadata tagging to the summary.
+
+9. **Final Output Stage**  
+   - **Agent:** Summarizer Agent  
+   - **Action:** Produces and returns the final summary to the user.
+
+---
+
+# Part 3: Branching Logic
+
+## 3 Branching Logic
+
+1. **Token Limit Decision Point**  
+   - **Condition Evaluated:** Does the input content exceed the LLM token limit?  
+   - **Branches:**  
+     - **Yes:** Preprocess content through cleaning, normalization, and chunking (handled by Summarizer Agent)  
+     - **No:** Proceed directly to prompt construction (handled by Summarizer Agent)
+
+2. **Summary Quality and Length Compliance Decision Point**  
+   - **Condition Evaluated:** Is the generated summary within the specified word limit and does it meet quality requirements?  
+   - **Branches:**  
+     - **Yes:** Proceed to post-processing and output (handled by Summarizer Agent)  
+     - **No:** Apply iterative refinement or re-summarization (handled by Summarizer Agent), then re-check quality and word limit.
+
+---
+
+# Part 4: Super Agent Delegation Instructions
+
+## 4 Summarizer Agent
+
+1) **Super Agent Name:**  
+   Summarizer Agent
+
+2) **Supervised Utility Agents:**  
+   - None (all tasks are handled internally; no subordinate utility agents specified)
+
+3) **Delegation Flow Overview:**  
+   The Summarizer Agent autonomously manages the entire summarization workflow. It receives user input, validates input size, preprocesses content if necessary, constructs prompts, calls the LLM, validates summary quality and length, applies iterative refinement or re-summarization as needed, and performs post-processing steps before delivering the final summary. There are no hand-offs or dependencies on other agents.
+
+4) **Task-Level Delegation:**  
+   - **Task Name:** Receive user input  
+     - **Responsible Utility Agent:** N/A (handled by Summarizer Agent itself)  
+     - **Key Instructions:** Accept content and word limit from user  
+     - **Specialization required:** Input validation, user interaction  
+     - **Trigger:** When user submits content and word limit  
+     - **Expected Utility Agent Output:** Validated input for processing
+
+   - **Task Name:** Input validation  
+     - **Responsible Utility Agent:** N/A  
+     - **Key Instructions:** Validate input size against LLM token limits  
+     - **Specialization required:** Token counting, LLM constraints  
+     - **Trigger:** After receiving user input  
+     - **Expected Utility Agent Output:** Boolean flag (exceeds/does not exceed)
+
+   - **Task Name:** Preprocess content  
+     - **Responsible Utility Agent:** N/A  
+     - **Key Instructions:** If token limit exceeded, clean, normalize, and chunk content  
+     - **Specialization required:** Text processing, chunking algorithms  
+     - **Trigger:** If token limit exceeded  
+     - **Expected Utility Agent Output:** Preprocessed content
+
+   - **Task Name:** Prompt construction  
+     - **Responsible Utility Agent:** N/A  
+     - **Key Instructions:** Build LLM prompt specifying summarization objective, style, and word limit  
+     - **Specialization required:** Prompt engineering  
+     - **Trigger:** After content is within token limit  
+     - **Expected Utility Agent Output:** LLM-ready prompt
+
+   - **Task Name:** LLM summarisation  
+     - **Responsible Utility Agent:** N/A  
+     - **Key Instructions:** Call LLM to generate summary  
+     - **Specialization required:** LLM API usage  
+     - **Trigger:** After prompt construction  
+     - **Expected Utility Agent Output:** Generated summary
+
+   - **Task Name:** Output validation  
+     - **Responsible Utility Agent:** N/A  
+     - **Key Instructions:** Validate summary against quality and word limit  
+     - **Specialization required:** Text analysis  
+     - **Trigger:** After LLM summarisation  
+     - **Expected Utility Agent Output:** Boolean flag (compliant/not compliant)
+
+   - **Task Name:** Refine/re-summarise  
+     - **Responsible Utility Agent:** N/A  
+     - **Key Instructions:** If summary exceeds word limit or lacks clarity, refine or re-summarise  
+     - **Specialization required:** Iterative summarisation  
+     - **Trigger:** If summary is not compliant  
+     - **Expected Utility Agent Output:** Refined summary
+
+   - **Task Name:** Post-processing  
+     - **Responsible Utility Agent:** N/A  
+     - **Key Instructions:** Apply formatting, language polishing, and metadata tagging  
+     - **Specialization required:** Text formatting, language quality, metadata management  
+     - **Trigger:** After summary is compliant  
+     - **Expected Utility Agent Output:** Final summary text
+
+   - **Task Name:** Final output  
+     - **Responsible Utility Agent:** N/A  
+     - **Key Instructions:** Return final summary to user  
+     - **Specialization required:** Output formatting  
+     - **Trigger:** After post-processing  
+     - **Expected Utility Agent Output:** Final summary text
+
+---
+
+**End of multi-part architecture document.**
